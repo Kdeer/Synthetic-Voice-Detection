@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 #Feature Extractor, Dataset Creation Functions
-max_pad_length = 86
+max_pad_length = 87
 def extract_features_cnn(file_name):
     try:
         audio,sample_rate = librosa.load(file_name)
@@ -35,10 +35,15 @@ def extract_feature(file_name):
     try:
         audio,sample_rate = librosa.load(file_name)
         mfccs = librosa.feature.mfcc(y=audio,sr=sample_rate,n_mfcc=40)
-        pad_width = max_pad_length - mfccs.shape[1]
-        mfccs = np.pad(mfccs, pad_width=((0, 0), (0, pad_width)), mode='constant')
+
+        if mfccs.shape[1] < 87:
+            pad_width = max_pad_length - mfccs.shape[1]
+            mfccs = np.pad(mfccs, pad_width=((0, 0), (0, pad_width)), mode='constant')
+        else:
+            mfccs = mfccs[:, :87]
+
     except Exception as e:
-        print("Error encountered while parsing file: ", file)
+        print("Error encountered while parsing file: ", file_name)
         return None, None
     return np.array([mfccs])
 
